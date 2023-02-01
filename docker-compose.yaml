@@ -1,0 +1,5 @@
+services:
+  url-shortener:
+    image: url-shortener
+    ports:
+      - 8080:8080
