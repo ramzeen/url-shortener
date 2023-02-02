@@ -1,15 +1,16 @@
 package com.ramzeen.urlshortener.utils;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class UniqueIdGenerator {
-    @Value("${server.id:101}")
-    private int serverId;
+
+    private static final AtomicLong sequence = new AtomicLong(10000000l);
 
 
     public long nextId() {
-        return System.nanoTime() + serverId;
+        return sequence.getAndIncrement();
     }
 }

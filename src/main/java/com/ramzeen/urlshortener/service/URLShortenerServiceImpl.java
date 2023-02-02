@@ -6,11 +6,12 @@ import com.ramzeen.urlshortener.domain.URLExpanderResponse;
 import com.ramzeen.urlshortener.domain.URLShortenerRequest;
 import com.ramzeen.urlshortener.domain.URLShortenerResponse;
 import com.ramzeen.urlshortener.repository.URLRepository;
-import com.ramzeen.urlshortener.utils.HashUtils;
+import com.ramzeen.urlshortener.utils.Encoder;
 import com.ramzeen.urlshortener.utils.UniqueIdGenerator;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,17 +21,17 @@ public class URLShortenerServiceImpl implements URLShortenerService {
     static final long DEFAULT_TTL_DAYS = 365;
     private URLRepository urlRepository;
     private UniqueIdGenerator idGenerator;
-    private HashUtils hashUtils;
+    private Encoder encoder;
 
-    public URLShortenerServiceImpl(URLRepository urlRepository, UniqueIdGenerator idGenerator, HashUtils hashUtils) {
+    public URLShortenerServiceImpl(URLRepository urlRepository, UniqueIdGenerator idGenerator, Encoder encoder) {
         this.urlRepository = urlRepository;
         this.idGenerator = idGenerator;
-        this.hashUtils = hashUtils;
+        this.encoder = encoder;
     }
 
     @Override
     public URLShortenerResponse shortenURL(URLShortenerRequest request) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         URLShortenerResponse response = new URLShortenerResponse(request.getLongURL(), makeShortURL(), request.getUserId(), now, calculateExpiration(now));
         urlRepository.saveURLShortenerResponse(response);
         return response;
@@ -38,7 +39,7 @@ public class URLShortenerServiceImpl implements URLShortenerService {
 
     private String makeShortURL() {
         long nextId = idGenerator.nextId();
-        return hashUtils.encode(nextId);
+        return encoder.encode(nextId);
     }
 
     @Override
@@ -47,6 +48,7 @@ public class URLShortenerServiceImpl implements URLShortenerService {
         Optional<URLShortenerResponse> urlShortenerResponse = urlRepository.getURLShortenerResponse(shortURL);
         if (urlShortenerResponse.isEmpty())
             throw new NoSuchURLException(shortURL);
+        // We can add logic to validate the expiration date here
         return new URLExpanderResponse(shortURL, urlShortenerResponse.get().getLongURL());
     }
 

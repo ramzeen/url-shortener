@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface URLShortenerService {
     URLShortenerResponse shortenURL(URLShortenerRequest request);
-    URLExpanderResponse  expandURL(URLExpanderRequest request) throws NoSuchURLException;
+
+    URLExpanderResponse expandURL(URLExpanderRequest request) throws NoSuchURLException;
 
     List<URLShortenerResponse> getAll();
 }

@@ -4,10 +4,11 @@ import com.ramzeen.urlshortener.domain.URLShortenerResponse;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class InMemoryURLRepository implements URLRepository {
-    private final Map<String, URLShortenerResponse> map = new HashMap<>();
+    private final Map<String, URLShortenerResponse> map = new ConcurrentHashMap<>();
 
     @Override
     public Optional<URLShortenerResponse> getURLShortenerResponse(String shortURLSuffix) {

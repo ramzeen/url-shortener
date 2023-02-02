@@ -5,7 +5,7 @@ import com.ramzeen.urlshortener.domain.URLExpanderRequest;
 import com.ramzeen.urlshortener.domain.URLShortenerRequest;
 import com.ramzeen.urlshortener.domain.URLShortenerResponse;
 import com.ramzeen.urlshortener.repository.URLRepository;
-import com.ramzeen.urlshortener.utils.HashUtils;
+import com.ramzeen.urlshortener.utils.Encoder;
 import com.ramzeen.urlshortener.utils.UniqueIdGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ public class TestURLShortenerServiceImpl {
     private final static String A_SAMPLE_USER_ID = "someuser";
 
     @Mock
-    HashUtils hashUtils;
+    Encoder encoder;
     @Mock
     UniqueIdGenerator idGenerator;
     @Mock
@@ -42,7 +43,7 @@ public class TestURLShortenerServiceImpl {
     @BeforeEach
     public void setup() {
         when(idGenerator.nextId()).thenReturn(1234l);
-        when(hashUtils.encode(anyLong())).thenReturn(A_SAMPLE_SHORTENED_URL_SUFFIX);
+        when(encoder.encode(anyLong())).thenReturn(A_SAMPLE_SHORTENED_URL_SUFFIX);
     }
 
     @Test
@@ -54,9 +55,9 @@ public class TestURLShortenerServiceImpl {
     }
 
     @Test
-    public void testThatWhenTheSuppliedShortURLIsLegitimateThenTheCorrespondingLongURLIsReturned() throws Exception{
+    public void testThatWhenTheSuppliedShortURLIsLegitimateThenTheCorrespondingLongURLIsReturned() throws Exception {
         URLExpanderRequest request = new URLExpanderRequest(A_SAMPLE_SHORTENED_URL_SUFFIX);
-        URLShortenerResponse shortenerResponse = new URLShortenerResponse(A_SAMPLE_LONG_URL, A_SAMPLE_SHORTENED_URL_SUFFIX,A_SAMPLE_USER_ID,
+        URLShortenerResponse shortenerResponse = new URLShortenerResponse(A_SAMPLE_LONG_URL, A_SAMPLE_SHORTENED_URL_SUFFIX, A_SAMPLE_USER_ID,
                 createLocalDateTime(-5), createLocalDateTime(360));
         when(repository.getURLShortenerResponse(A_SAMPLE_SHORTENED_URL_SUFFIX)).thenReturn(Optional.of(shortenerResponse));
         assertEquals(A_SAMPLE_LONG_URL, service.expandURL(request).getLongURL());
@@ -72,6 +73,6 @@ public class TestURLShortenerServiceImpl {
     }
 
     private LocalDateTime createLocalDateTime(long days) {
-        return LocalDateTime.now().plusDays(days);
+        return LocalDateTime.now(ZoneOffset.UTC).plusDays(days);
     }
 }

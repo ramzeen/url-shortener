@@ -38,7 +38,7 @@ public class TestURLShortenerController {
     private URLShortenerService urlShortenerService;
 
     @Test
-    public void testThatWhenTheShortenerServiceReturnsAGoodResponseForURLShorteningThenTheControllerReturnsAGoodResponseToTheCaller() throws Exception{
+    public void testThatWhenTheShortenerServiceReturnsAGoodResponseForURLShorteningThenTheControllerReturnsAGoodResponseToTheCaller() throws Exception {
         URLShortenerResponse response = makeGoodShortenerResponse();
         when(urlShortenerService.shortenURL(any())).thenReturn(response);
         this.mockMvc.perform(post("/api/v1/create").contentType(MediaType.APPLICATION_JSON).content(toJson(makeRequest()))).andDo(print()).andExpect(status().isOk())
@@ -46,14 +46,14 @@ public class TestURLShortenerController {
     }
 
     @Test
-    public void testThatWhenTheShortenerServiceReturnsAGoodResponseForURLExpansionThenTheControllerRedirectsToTheCorrectLongURL() throws Exception{
+    public void testThatWhenTheShortenerServiceReturnsAGoodResponseForURLExpansionThenTheControllerRedirectsToTheCorrectLongURL() throws Exception {
         URLExpanderResponse response = makeGoodExpanderResponse();
         when(urlShortenerService.expandURL(any())).thenReturn(response);
         this.mockMvc.perform(get("/" + A_SAMPLE_SHORTENED_URL_SUFFIX)).andDo(print()).andExpect(redirectedUrl(A_SAMPLE_LONG_URL)).andExpect(status().is3xxRedirection());
     }
 
     @Test
-    public void testThatWhenTheShortenerServiceReturnsNoURLFoundResponseForURLExpansionThenTheControllerRespondsWithANotFoundError() throws Exception{
+    public void testThatWhenTheShortenerServiceReturnsNoURLFoundResponseForURLExpansionThenTheControllerRespondsWithANotFoundError() throws Exception {
         URLExpanderResponse response = makeGoodExpanderResponse();
         when(urlShortenerService.expandURL(any())).thenThrow(new NoSuchURLException(""));
         this.mockMvc.perform(get("/" + A_SAMPLE_SHORTENED_URL_SUFFIX)).andDo(print()).andExpect(status().isNotFound());

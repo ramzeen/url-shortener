@@ -112,7 +112,7 @@ It does not have to be a relational database
 
 ## High Level Architecture
 
-![High Level Architecture](high-level.jpg "High Level Architecture")
+![High Level Architecture](high-level-arch.jpg "High Level Architecture")
 
 
 ## Caching
@@ -149,3 +149,4 @@ http://localhost:8080/v3/api-docs
 * One crucial component of the system is the unique id generator. The code in this repo has just a dummy generator and we would need a really good one in a production system to avoid collisions
 * The calculation of short url suffix can be done before hand and be stored in the database
 * The reason for allowing duplicate long urls is to provide an accurate analytics (explain!)
+* Redirect 302 vs 301

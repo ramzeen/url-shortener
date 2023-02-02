@@ -12,15 +12,15 @@ public class URLShortenerResponse {
     private final String longURL;
     private final String shortURLSuffix;
     private final String userId;
-    private final LocalDateTime created;
-    private final LocalDateTime expiration;
+    private final LocalDateTime createdDateTime;
+    private final LocalDateTime expirationDateTime;
 
-    public URLShortenerResponse(String longURL, String shortURLSuffix, String userId, LocalDateTime created, LocalDateTime expiration) {
+    public URLShortenerResponse(String longURL, String shortURLSuffix, String userId, LocalDateTime createdDateTime, LocalDateTime expirationDateTime) {
         this.longURL = longURL;
         this.shortURLSuffix = shortURLSuffix;
         this.userId = userId;
-        this.created = created;
-        this.expiration = expiration;
+        this.createdDateTime = createdDateTime;
+        this.expirationDateTime = expirationDateTime;
     }
 
     public String getLongURL() {
@@ -37,7 +37,7 @@ public class URLShortenerResponse {
     }
 
     public String getExpiration() {
-        return expiration.format(FORMAT);
+        return expirationDateTime.format(FORMAT);
     }
 
     public String getUserId() {
@@ -45,7 +45,17 @@ public class URLShortenerResponse {
     }
 
     public String getCreated() {
-        return created.format(FORMAT);
+        return createdDateTime.format(FORMAT);
+    }
+
+    @JsonIgnore
+    public LocalDateTime getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    @JsonIgnore
+    public LocalDateTime getExpirationDateTime() {
+        return expirationDateTime;
     }
 
     @Override
@@ -54,8 +64,8 @@ public class URLShortenerResponse {
                 "longURL='" + longURL + '\'' +
                 ", shortURLSuffix='" + shortURLSuffix + '\'' +
                 ", userId='" + userId + '\'' +
-                ", created=" + created +
-                ", expiration=" + expiration +
+                ", created=" + createdDateTime +
+                ", expiration=" + expirationDateTime +
                 '}';
     }
 }
