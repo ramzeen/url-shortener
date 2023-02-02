@@ -1,36 +1,17 @@
-## Intro
+# Intro
 A URL Shortener that provides api endpoints to shorten a given URL and expand the shortened URL and redirect to the original URL
 
 ## Use cases and assumptions
 
 * A registered user creates a shortened url using the service
 * Any user can hit the shortened url (and will be redirected to the underlying URL)
-* No modification (update or delete) is supported
+* No modification (update or delete) on an already created short urls is supported
 * Duplicate original urls are allowed (explain!)
+* No custom url is allowed (for simplicity)
+* Short urls expire after a year
 
-## Build and run
-Requires java 17
-
-```console
-mvn clean install
-java -jar target/url-shortener-1.0.jar 
-```
-
-## Docker
-
-After the artifact has been built:
-```console
-docker build -t url-shortener .
-docker-compose up
-```
-
-## Swagger UI
-http://localhost:8080/swagger-ui.html
-
-## Open API Docs
-http://localhost:8080/v3/api-docs
-
-## Response to shorten a url
+## Sample calls
+### Create a short url
 ```console
 curl -s 'localhost:8080/api/v1/create' -d '{"longURL":"https://www.cnn.com/2023/02/01/us/washington-hinman-glacier-disappear-climate/index.html", "userId":"abcdefgh"}' -H 'Content-Type: application/json
 ```
@@ -44,7 +25,7 @@ curl -s 'localhost:8080/api/v1/create' -d '{"longURL":"https://www.cnn.com/2023/
 }
 ```
 
-## Response to expand a valid short url
+### Expand a valid short url
 ```console
 curl -v 'http://localhost:8080/fA6nvDqxL'
 ```
@@ -65,7 +46,7 @@ curl -v 'http://localhost:8080/fA6nvDqxL'
 <
 * Connection #0 to host localhost left intact
 ```
-## Response to expand an invalid short url
+## Expand an invalid short url
 ```console
 curl -v 'http://localhost:8080/abcd'
 ```
@@ -92,7 +73,7 @@ curl -v 'http://localhost:8080/abcd'
 * Redirects a day (assuming 100 reads per a shortened url) - 10K qps
 * Total urls to store (assuming a time period of 15 years) 10 million * 365 * 15 = 55 Billion
 * Average size of a record - 1200 Bytes
-* Total size  - 55B * 1200 = 65 TB
+* Total storage size required  - 55B * 1200 = 65 TB
 
 ## Representation of shorted url
 
@@ -119,7 +100,7 @@ mysql> desc url;
 | Field            | Type          | Null | Key | Default | Extra          |
 +------------------+---------------+------+-----+---------+----------------+
 | id               | int           | NO   | PRI | NULL    | auto_increment |
-| original_url     | varchar(5000) | NO   |     | NULL    |                |
+| long_url         | varchar(5000) | NO   |     | NULL    |                |
 | short_url_suffix | varchar(10)   | NO   |     | NULL    |                |
 | created          | datetime      | NO   |     | NULL    |                |
 | expires          | datetime      | NO   |     | NULL    |                |
@@ -136,7 +117,35 @@ It does not have to be a relational database
 
 ## Caching
 
+To reduce the load on the db and to drive better response time, a caching layer can be introduced (Probably with an expiration of 24 hours or a week with a capcity for x percent. Need more data)
+
 ## Security
+The user id passed at the time of creation of the short url is infact an api key (so it is something akin to a password). We can add a layer in the code to validate the incoming api key against stored values in the database.
 
-## Other Issues
+## Build and run
+Requires java 17
 
+```console
+mvn clean install
+java -jar target/url-shortener-1.0.jar 
+```
+
+## Docker
+
+After the artifact has been built:
+```console
+docker build -t url-shortener .
+docker-compose up
+```
+
+## Swagger UI
+http://localhost:8080/swagger-ui.html
+
+## Open API Docs
+http://localhost:8080/v3/api-docs
+
+## Other Issues  and Notes
+* The service can be offered with permissions to create a limited number of short urls in a given period (or multiple priced tiers). This limiting can be enforced by a gateway product that offers rate limiting capabilities based on certain criteria like user_id or ip address. Having such a rate limiting functionality would also prevent from any DOS attacks
+* One crucial component of the system is the unique id generator. The code in this repo has just a dummy generator and we would need a really good one in a production system to avoid collisions
+* The calculation of short url suffix can be done before hand and be stored in the database
+* The reason for allowing duplicate long urls is to provide an accurate analytics (explain!)
