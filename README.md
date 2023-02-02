@@ -122,6 +122,7 @@ To reduce the load on the db and to drive better response time, a caching layer 
 ## Security
 The user id passed at the time of creation of the short url is infact an api key (so it is something akin to a password). We can add a layer in the code to validate the incoming api key against stored values in the database.
 
+If the api is part of something like twitter (where twitter itself is doing the url shortening request, then a typical oauth can be implemented with client credentials grant.
 ## Build and run
 Requires java 17
 

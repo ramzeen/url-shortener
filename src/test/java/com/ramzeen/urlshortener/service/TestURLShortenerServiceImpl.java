@@ -72,6 +72,17 @@ public class TestURLShortenerServiceImpl {
         });
     }
 
+    @Test
+    public void testThatWhenTheSuppliedShortURLHasExpiredThenANoSuchURLExceptionIsThrown() {
+        URLExpanderRequest request = new URLExpanderRequest(A_SAMPLE_SHORTENED_URL_SUFFIX);
+        URLShortenerResponse shortenerResponse = new URLShortenerResponse(A_SAMPLE_LONG_URL, A_SAMPLE_SHORTENED_URL_SUFFIX, A_SAMPLE_USER_ID,
+                createLocalDateTime(-375), createLocalDateTime(-10));
+        when(repository.getURLShortenerResponse(A_SAMPLE_SHORTENED_URL_SUFFIX)).thenReturn(Optional.of(shortenerResponse));
+        Exception exception = assertThrows(NoSuchURLException.class, () -> {
+            service.expandURL(request);
+        });
+    }
+
     private LocalDateTime createLocalDateTime(long days) {
         return LocalDateTime.now(ZoneOffset.UTC).plusDays(days);
     }

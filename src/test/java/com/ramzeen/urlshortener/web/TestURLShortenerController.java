@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import static com.ramzeen.urlshortener.domain.URLShortenerResponse.BASE_URL;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,7 +65,7 @@ public class TestURLShortenerController {
     }
 
     private URLShortenerResponse makeGoodShortenerResponse() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         return new URLShortenerResponse(A_SAMPLE_LONG_URL, A_SAMPLE_SHORTENED_URL, A_SAMPLE_USER_ID, now, now.plusDays(10));
     }
 

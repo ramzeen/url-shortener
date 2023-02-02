@@ -44,11 +44,11 @@ public class URLShortenerServiceImpl implements URLShortenerService {
 
     @Override
     public URLExpanderResponse expandURL(URLExpanderRequest request) throws NoSuchURLException {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         String shortURL = request.getShortURL();
         Optional<URLShortenerResponse> urlShortenerResponse = urlRepository.getURLShortenerResponse(shortURL);
-        if (urlShortenerResponse.isEmpty())
+        if (urlShortenerResponse.isEmpty() || urlShortenerResponse.get().getExpirationDateTime().isBefore(now))
             throw new NoSuchURLException(shortURL);
-        // We can add logic to validate the expiration date here
         return new URLExpanderResponse(shortURL, urlShortenerResponse.get().getLongURL());
     }
 
